@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Secp256k1.Native" Version="0.1.20" />
+    <PackageReference Include="Secp256k1.Net" Version="0.1.54" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NCryptoLib\NCryptoLib.csproj" />
+  </ItemGroup>
+
+</Project>
