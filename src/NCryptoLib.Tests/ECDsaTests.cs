@@ -7,32 +7,33 @@ using Xunit;
 
 namespace NCryptoLib.Tests
 {
-    public class Secp256k1Tests
+    public class ECDsaTests
     {
         [Fact]
         public void TestBtcSignAndVerfiy()
         {
             var signer = new Secp256k1DotNet();
             var signature = this.TestSign(signer);
-         
-            //Assert.True(secp256k1.Verify(signature, msg, kp.PublicKey));
         }
 
         [Fact]
         public void TestMsftSignAndVerify()
         {
             var signer = new MsftECDsaCng();
-            var signature = this.TestSign(signer);
+            var signature = this.TestSign(signer);            
         }
 
         private Span<byte> TestSign(IECDsa signer)
         {
-            Key key = signer.CreatePrivateKey();          
+            Key key = signer.CreateKey();          
             using (var rnd = RandomNumberGenerator.Create())
             {
-                var data = new byte[32]; 
+                var data = new byte[32];
+                rnd.GetBytes(data);
                 Span<byte> signature = signer.SignData(data, key);
-                return signature;
+                if (signer.VerifyData(data, signature.ToArray(), key))
+                    return signature;
+                throw new Exception();
             }
         }
 

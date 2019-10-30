@@ -26,6 +26,11 @@ namespace NCryptoLib.ECDsa
 
         public Key CreatePrivateKey()
         {
+            return this.CreateKey();
+        }
+
+        public Key CreateKey()
+        {
             using (ECDsaCng dsa = new ECDsaCng(256))
             {
                 dsa.HashAlgorithm = CngAlgorithm.Sha256;
@@ -58,6 +63,35 @@ namespace NCryptoLib.ECDsa
                 byte[] signature = ecsdKey.SignData(data);
 
                 return signature;
+            }
+        }
+
+        public Span<byte> SignHash(Span<byte> hash, Key key)
+        {
+            using (ECDsaCng ecsdKey = new ECDsaCng(ConvertToCngKey(key)))
+            {
+                ecsdKey.HashAlgorithm = CngAlgorithm.Sha256;
+                byte[] signature = ecsdKey.SignHash(hash.ToArray());
+
+                return signature;
+            }
+        }
+
+        public bool VerifyData(byte[] data, byte[] signature, Key key)
+        {
+            using (ECDsaCng ecsdKey = new ECDsaCng(ConvertToCngKey(key)))
+            {
+                ecsdKey.HashAlgorithm = CngAlgorithm.Sha256;
+                return ecsdKey.VerifyData(data, signature);
+            }
+        }
+
+        public bool VerifyHash(Span<byte> hash, Span<byte> signature, Key key)
+        {
+            using (ECDsaCng ecsdKey = new ECDsaCng(ConvertToCngKey(key)))
+            {
+                ecsdKey.HashAlgorithm = CngAlgorithm.Sha256;
+                return ecsdKey.VerifyHash(hash, signature);                
             }
         }
 
