@@ -8,9 +8,9 @@ namespace NCryptoLib.ECDsa
         public Key CreatePrivateKey();
         public Key CreateKey();
         public bool IsPrivateKeyValid(Key key);
-        public Span<byte> SignData(byte[] data, Key key);
-        public Span<byte> SignHash(Span<byte> hash, Key key);
-        public bool VerifyData(byte[] data, byte[] signature, Key key);
-        public bool VerifyHash(Span<byte> hash, Span<byte> signature, Key key);
+        public Signature SignData(byte[] data, Key key);
+        public Signature SignHash(Span<byte> hash, Key key);
+        public bool VerifyData(byte[] data, Signature signature, Key key);
+        public bool VerifyHash(Span<byte> hash, Signature signature, Key key);
     }
 }

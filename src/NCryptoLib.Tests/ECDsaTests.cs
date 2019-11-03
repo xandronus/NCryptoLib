@@ -10,7 +10,7 @@ namespace NCryptoLib.Tests
     public class ECDsaTests
     {
         [Fact]
-        public void TestBtcSignAndVerfiy()
+        public void TestSecp256k1SignAndVerify()
         {
             var signer = new Secp256k1DotNet();
             var signature = this.TestSign(signer);
@@ -23,18 +23,47 @@ namespace NCryptoLib.Tests
             var signature = this.TestSign(signer);            
         }
 
-        private Span<byte> TestSign(IECDsa signer)
+        [Fact]
+        public void TestMsftRSAccessors()
         {
-            Key key = signer.CreateKey();          
-            using (var rnd = RandomNumberGenerator.Create())
-            {
-                var data = new byte[32];
-                rnd.GetBytes(data);
-                Span<byte> signature = signer.SignData(data, key);
-                if (signer.VerifyData(data, signature.ToArray(), key))
-                    return signature;
-                throw new Exception();
-            }
+            var signer = new MsftECDsaCng();
+            this.TestRSAccessors(signer);
+        }
+
+        [Fact]
+        public void TestSecp256k1RSAccessors()
+        {
+            var signer = new MsftECDsaCng();
+            this.TestRSAccessors(signer);
+        }
+
+        private void TestRSAccessors(IECDsa signer)
+        {
+            Key key = signer.CreateKey();
+            using var rnd = RandomNumberGenerator.Create();
+            var data = new byte[32];
+            rnd.GetBytes(data);
+            var signature = signer.SignData(data, key);
+            var R = signature.GetR();
+            var S = signature.GetS();
+
+            Signature RS = new Signature { Data = new byte[64] };
+            RS.Set(R, S);
+
+            Assert.Equal(signature.Data.ToArray(), RS.Data.ToArray());
+        }
+
+        private Signature TestSign(IECDsa signer)
+        {
+            Key key = signer.CreateKey();
+            using var rnd = RandomNumberGenerator.Create();
+
+            var data = new byte[32];
+            rnd.GetBytes(data);
+            var signature = signer.SignData(data, key);
+            if (signer.VerifyData(data, signature, key))
+                return signature;
+            throw new Exception();
         }
 
         /// <summary>

@@ -1,5 +1,9 @@
 ﻿using System;
 
+// TODO: add context toeach call to avoid recreating context
+// vrs output - checkout secp256k1_pubkey_serialize_compac v=recovery id without 27 constant
+// https://bitcoin.stackexchange.com/questions/38351/ecdsa-v-r-s-what-is-v
+// Signature = 32 byte R, 32 byte S
 namespace NCryptoLib.ECDsa
 {
     /// <summary>
@@ -45,41 +49,41 @@ namespace NCryptoLib.ECDsa
             }
         }
 
-        public Span<byte> SignData(byte[] data, Key key)
+        public Signature SignData(byte[] data, Key key)
         {
             using (var secp256k1 = new Secp256k1Net.Secp256k1())
             {
                 Span<byte> signature = new byte[SignatureLength];
                 if (!secp256k1.Sign(signature, data, key.PrivateKey))
                     throw new CryptoException("Secp256k1 sign failure");
-                return signature;
+                return new Signature { Data = signature };
             }
         }
 
-        public Span<byte> SignHash(Span<byte> hash, Key key)
+        public Signature SignHash(Span<byte> hash, Key key)
         {
             using (var secp256k1 = new Secp256k1Net.Secp256k1())
             {
                 Span<byte> signature = new byte[SignatureLength];
                 if (!secp256k1.Sign(signature, hash, key.PrivateKey))
                     throw new CryptoException("Secp256k1 sign failure");
-                return signature;
+                return new Signature { Data = signature };
             }
         }
 
-        public bool VerifyData(byte[] data, byte[] signature, Key key)
+        public bool VerifyData(byte[] data, Signature signature, Key key)
         {
             using (var secp256k1 = new Secp256k1Net.Secp256k1())
             {
-                return secp256k1.Verify(signature, data, key.PublicKey);
+                return secp256k1.Verify(signature.Data, data, key.PublicKey);
             }
         }
 
-        public bool VerifyHash(Span<byte> hash, Span<byte> signature, Key key)
+        public bool VerifyHash(Span<byte> hash, Signature signature, Key key)
         {
             using (var secp256k1 = new Secp256k1Net.Secp256k1())
             {
-                return secp256k1.Verify(signature, hash, key.PublicKey);
+                return secp256k1.Verify(signature.Data, hash, key.PublicKey);
             }
         }
     }

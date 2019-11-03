@@ -55,43 +55,43 @@ namespace NCryptoLib.ECDsa
             }
         }
 
-        public Span<byte> SignData(byte[] data, Key key)
+        public Signature SignData(byte[] data, Key key)
         {
             using (ECDsaCng ecsdKey = new ECDsaCng(ConvertToCngKey(key)))
             {
                 ecsdKey.HashAlgorithm = CngAlgorithm.Sha256;
                 byte[] signature = ecsdKey.SignData(data);
 
-                return signature;
+                return new Signature { Data = signature };
             }
         }
 
-        public Span<byte> SignHash(Span<byte> hash, Key key)
+        public Signature SignHash(Span<byte> hash, Key key)
         {
             using (ECDsaCng ecsdKey = new ECDsaCng(ConvertToCngKey(key)))
             {
                 ecsdKey.HashAlgorithm = CngAlgorithm.Sha256;
                 byte[] signature = ecsdKey.SignHash(hash.ToArray());
 
-                return signature;
+                return new Signature { Data = signature };
             }
         }
 
-        public bool VerifyData(byte[] data, byte[] signature, Key key)
+        public bool VerifyData(byte[] data, Signature signature, Key key)
         {
             using (ECDsaCng ecsdKey = new ECDsaCng(ConvertToCngKey(key)))
             {
                 ecsdKey.HashAlgorithm = CngAlgorithm.Sha256;
-                return ecsdKey.VerifyData(data, signature);
+                return ecsdKey.VerifyData(data, signature.Data.ToArray());
             }
         }
 
-        public bool VerifyHash(Span<byte> hash, Span<byte> signature, Key key)
+        public bool VerifyHash(Span<byte> hash, Signature signature, Key key)
         {
             using (ECDsaCng ecsdKey = new ECDsaCng(ConvertToCngKey(key)))
             {
                 ecsdKey.HashAlgorithm = CngAlgorithm.Sha256;
-                return ecsdKey.VerifyHash(hash, signature);                
+                return ecsdKey.VerifyHash(hash, signature.Data.ToArray());                
             }
         }
 
