@@ -181,6 +181,7 @@ namespace NCryptoLib.ECDsa
         /// <returns></returns>
         public static ECDsaCng ConvertToCngKey(Key key)
         {
+            // TODO: Look at moving this to an extension method?
             return new ECDsaCng(CngKey.Import(ConvertToCngKeyData(key), CngKeyBlobFormat.EccPrivateBlob));
         }
 
