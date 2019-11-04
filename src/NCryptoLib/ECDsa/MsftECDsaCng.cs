@@ -12,39 +12,64 @@ namespace NCryptoLib.ECDsa
     public class MsftECDsaCng : IECDsa
     {
         
-        public Span<byte> CreateSecret()
-        {           
-            using (ECDsaCng dsa = new ECDsaCng(256))
-            {  
-                dsa.HashAlgorithm = CngAlgorithm.Sha256;
-                byte[] keyData = dsa.Key.Export(CngKeyBlobFormat.EccPrivateBlob);
+        public Span<byte> CreateSecret(ECDsaContext context = null)
+        {
+            ECDsaCng dsa = context?.Context as ECDsaCng;
+            if (dsa == null)
+            {
+                dsa = new ECDsaCng(256)
+                {
+                    HashAlgorithm = CngAlgorithm.Sha256
+                };
+            }
 
+            try
+            {
+                byte[] keyData = dsa.Key.Export(CngKeyBlobFormat.EccPrivateBlob);
                 var key = ConvertEccPrivateBlob(keyData);
                 return key.PrivateKey;
-            }                        
-        }
-
-        public Key CreatePrivateKey()
-        {
-            return this.CreateKey();
-        }
-
-        public Key CreateKey()
-        {
-            using (ECDsaCng dsa = new ECDsaCng(256))
+            }
+            finally
             {
-                dsa.HashAlgorithm = CngAlgorithm.Sha256;
-                byte[] keyData = dsa.Key.Export(CngKeyBlobFormat.EccPrivateBlob);
-
-                return ConvertEccPrivateBlob(keyData);
+                if (context == null)
+                    dsa?.Dispose();
             }
         }
 
-        public bool IsPrivateKeyValid(Key key)
+        public Key CreatePrivateKey(ECDsaContext context = null)
+        {
+            return this.CreateKey(context);
+        }
+
+        public Key CreateKey(ECDsaContext context = null)
+        {
+            ECDsaCng dsa = context?.Context as ECDsaCng;
+            if (dsa == null)
+            {
+                dsa = new ECDsaCng(256)
+                {
+                    HashAlgorithm = CngAlgorithm.Sha256
+                };
+            }
+
+            try
+            {
+                byte[] keyData = dsa.Key.Export(CngKeyBlobFormat.EccPrivateBlob);
+                var key = ConvertEccPrivateBlob(keyData);
+                return key;
+            }
+            finally
+            {
+                if (context == null)
+                    dsa?.Dispose();
+            }
+        }
+
+        public bool IsPrivateKeyValid(Key key, ECDsaContext context = null)
         {
             try
             {
-                using (ECDsaCng ecsdKey = new ECDsaCng(ConvertToCngKey(key)))
+                using (ConvertToCngKey(key))
                 {
                     return true;
                 }
@@ -55,49 +80,87 @@ namespace NCryptoLib.ECDsa
             }
         }
 
-        public Signature SignData(byte[] data, Key key)
+        public Signature SignData(byte[] data, Key key, ECDsaContext context = null)
         {
-            using (ECDsaCng ecsdKey = new ECDsaCng(ConvertToCngKey(key)))
+            ECDsaCng dsa = context?.Context as ECDsaCng;
+            if (dsa == null)
             {
-                ecsdKey.HashAlgorithm = CngAlgorithm.Sha256;
-                byte[] signature = ecsdKey.SignData(data);
+                dsa = ConvertToCngKey(key);
+            }
+
+            try
+            { 
+                byte[] signature = dsa.SignData(data);
+                return new Signature { Data = signature };
+            }
+            finally
+            {
+                if (context == null)
+                    dsa?.Dispose();
+            }
+        }
+
+        public Signature SignHash(Span<byte> hash, Key key, ECDsaContext context = null)
+        {
+            ECDsaCng dsa = context?.Context as ECDsaCng;
+            if (dsa == null)
+            {
+                dsa = ConvertToCngKey(key);
+            }
+            
+            try
+            {                
+                byte[] signature = dsa.SignHash(hash.ToArray());
 
                 return new Signature { Data = signature };
             }
-        }
-
-        public Signature SignHash(Span<byte> hash, Key key)
-        {
-            using (ECDsaCng ecsdKey = new ECDsaCng(ConvertToCngKey(key)))
+            finally
             {
-                ecsdKey.HashAlgorithm = CngAlgorithm.Sha256;
-                byte[] signature = ecsdKey.SignHash(hash.ToArray());
-
-                return new Signature { Data = signature };
-            }
+                if (context == null)
+                    dsa?.Dispose();
+            }           
         }
 
-        public bool VerifyData(byte[] data, Signature signature, Key key)
+        public bool VerifyData(byte[] data, Signature signature, Key key, ECDsaContext context = null)
         {
-            using (ECDsaCng ecsdKey = new ECDsaCng(ConvertToCngKey(key)))
+            ECDsaCng dsa = context?.Context as ECDsaCng;
+            if (dsa == null)
             {
-                ecsdKey.HashAlgorithm = CngAlgorithm.Sha256;
-                return ecsdKey.VerifyData(data, signature.Data.ToArray());
+                dsa = ConvertToCngKey(key);
             }
+
+            try
+            {
+                return dsa.VerifyData(data, signature.Data.ToArray());
+            }
+            finally
+            {
+                if (context == null)
+                    dsa?.Dispose();
+            }  
         }
 
-        public bool VerifyHash(Span<byte> hash, Signature signature, Key key)
+        public bool VerifyHash(Span<byte> hash, Signature signature, Key key, ECDsaContext context = null)
         {
-            using (ECDsaCng ecsdKey = new ECDsaCng(ConvertToCngKey(key)))
+            ECDsaCng dsa = context?.Context as ECDsaCng;
+            if (dsa == null)
             {
-                ecsdKey.HashAlgorithm = CngAlgorithm.Sha256;
-                return ecsdKey.VerifyHash(hash, signature.Data.ToArray());                
+                dsa = ConvertToCngKey(key);
             }
+
+            try
+            {
+                return dsa.VerifyHash(hash, signature.Data.ToArray());
+            }
+            finally
+            {
+                if (context == null)
+                    dsa?.Dispose();
+            } 
         }
 
-        // https://stackoverflow.com/questions/24251336/import-a-public-key-from-somewhere-else-to-cngkey
-        private CngKey ConvertToCngKey(Key key)
-        {       
+        public static ECDsaCng ConvertToCng(Key key)
+        {
             var publicPrivateKey = Array.Empty<byte>().Concat(key.PublicKey.ToArray()).Concat(key.PrivateKey.ToArray()).ToArray();
 
             var keyType = new byte[] { 0x45, 0x43, 0x53, 0x32 };
@@ -108,10 +171,34 @@ namespace NCryptoLib.ECDsa
             var keyImport = keyType.Concat(keyLength).Concat(keyData).ToArray();
 
             var cngKey = CngKey.Import(keyImport, CngKeyBlobFormat.EccPrivateBlob);
-            return cngKey;
+            return new ECDsaCng(cngKey);
         }
 
-        private Key ConvertEccPrivateBlob(byte[] keyData)
+        /// <summary>
+        /// Creates a CngKey from a public key
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public static ECDsaCng ConvertToCngKey(Key key)
+        {
+            return new ECDsaCng(CngKey.Import(ConvertToCngKeyData(key), CngKeyBlobFormat.EccPrivateBlob));
+        }
+
+        // https://stackoverflow.com/questions/24251336/import-a-public-key-from-somewhere-else-to-cngkey
+        public static byte[] ConvertToCngKeyData(Key key)
+        {
+            var publicPrivateKey = Array.Empty<byte>().Concat(key.PublicKey.ToArray()).Concat(key.PrivateKey.ToArray()).ToArray();
+
+            var keyType = new byte[] { 0x45, 0x43, 0x53, 0x32 };
+            var keyLength = new byte[] { 0x20, 0x00, 0x00, 0x00 };
+
+            var keyData = publicPrivateKey.Skip(1).ToArray();
+
+            var keyImport = keyType.Concat(keyLength).Concat(keyData).ToArray();
+            return keyImport;
+        }
+
+        public static Key ConvertEccPrivateBlob(byte[] keyData)
         { 
             var privateKey = keyData.TakeLast(32).ToArray();
             var publicKeyPrefix = new byte[] { 0x40 };

@@ -1,6 +1,5 @@
 ﻿using System;
 
-// TODO: add context toeach call to avoid recreating context
 // vrs output - checkout secp256k1_pubkey_serialize_compac v=recovery id without 27 constant
 // https://bitcoin.stackexchange.com/questions/38351/ecdsa-v-r-s-what-is-v
 // Signature = 32 byte R, 32 byte S
@@ -12,78 +11,120 @@ namespace NCryptoLib.ECDsa
     /// </summary>
     public class Secp256k1DotNet : IECDsa
     {
-        public const int SignatureLength = Secp256k1Net.Secp256k1.UNSERIALIZED_SIGNATURE_SIZE;
+        public const int SignatureLength = Secp256k1Net.Secp256k1.SIGNATURE_LENGTH;
         public const int PublicKeyLength = Secp256k1Net.Secp256k1.PUBKEY_LENGTH;
+        public const int HashLength = Secp256k1Net.Secp256k1.HASH_LENGTH;
 
-        public Span<byte> CreateSecret()
+        public Span<byte> CreateSecret(ECDsaContext context = null)
         {
             return ECDsaKeyGen.CreatePrivateKey(this);
         }
 
-        public Key CreatePrivateKey()
+        public Key CreatePrivateKey(ECDsaContext context = null)
         {
             return new Key
             {
-                PrivateKey = this.CreateSecret(),
+                PrivateKey = this.CreateSecret(context),
                 PublicKey = null
             };
         }
 
-        public bool IsPrivateKeyValid(Key key)
+        public bool IsPrivateKeyValid(Key key, ECDsaContext context = null)
         {
-            using (var secp256k1 = new Secp256k1Net.Secp256k1())
+            Secp256k1Net.Secp256k1 dsa = context?.Context as Secp256k1Net.Secp256k1;
+            if (dsa == null)
             {
-                return secp256k1.SecretKeyVerify(key.PrivateKey);
+                dsa = new Secp256k1Net.Secp256k1();
             }
+
+            try
+            {
+                return dsa.SecretKeyVerify(key.PrivateKey);
+            }
+            finally
+            {
+                if (context == null)
+                    dsa?.Dispose();
+            } 
         }
 
-        public Key CreateKey()
+        public Key CreateKey(ECDsaContext context = null)
         {
-            using (var secp256k1 = new Secp256k1Net.Secp256k1())
+            Secp256k1Net.Secp256k1 dsa = context?.Context as Secp256k1Net.Secp256k1;
+            if (dsa == null)
+            {
+                dsa = new Secp256k1Net.Secp256k1();
+            }
+
+            try
             {
                 Key key = this.CreatePrivateKey();
                 key.PublicKey = new byte[PublicKeyLength];
-                if (!secp256k1.PublicKeyCreate(key.PublicKey, key.PrivateKey))
+                if (!dsa.PublicKeyCreate(key.PublicKey, key.PrivateKey))
                     throw new CryptoException("Secp256k1 can't create public key from private key");
                 return key;
             }
+            finally
+            {
+                if (context == null)
+                    dsa?.Dispose();
+            } 
         }
 
-        public Signature SignData(byte[] data, Key key)
+        public Signature SignData(byte[] data, Key key, ECDsaContext context = null)
         {
-            using (var secp256k1 = new Secp256k1Net.Secp256k1())
+            //TODO: hash and then sign
+            if (data.Length > HashLength)
+                throw new CryptoException("Secp256k1 only supports signing hashes.");
+            return this.SignHash(data, key, context);
+        }
+
+        public Signature SignHash(Span<byte> hash, Key key, ECDsaContext context = null)
+        {
+            Secp256k1Net.Secp256k1 dsa = context?.Context as Secp256k1Net.Secp256k1;
+            if (dsa == null)
+            {
+                dsa = new Secp256k1Net.Secp256k1();
+            }
+
+            try
             {
                 Span<byte> signature = new byte[SignatureLength];
-                if (!secp256k1.Sign(signature, data, key.PrivateKey))
+                if (!dsa.Sign(signature, hash, key.PrivateKey))
                     throw new CryptoException("Secp256k1 sign failure");
                 return new Signature { Data = signature };
             }
-        }
-
-        public Signature SignHash(Span<byte> hash, Key key)
-        {
-            using (var secp256k1 = new Secp256k1Net.Secp256k1())
+            finally
             {
-                Span<byte> signature = new byte[SignatureLength];
-                if (!secp256k1.Sign(signature, hash, key.PrivateKey))
-                    throw new CryptoException("Secp256k1 sign failure");
-                return new Signature { Data = signature };
+                if (context == null)
+                    dsa?.Dispose();
             }
+         }
+
+        public bool VerifyData(byte[] data, Signature signature, Key key, ECDsaContext context = null)
+        {
+            //TODO: hash and then verify
+            if (data.Length > HashLength)
+                throw new CryptoException("Secp256k1 only supports signing hashes.");
+            return this.VerifyHash(data, signature, key, context);
         }
 
-        public bool VerifyData(byte[] data, Signature signature, Key key)
+        public bool VerifyHash(Span<byte> hash, Signature signature, Key key, ECDsaContext context = null)
         {
-            using (var secp256k1 = new Secp256k1Net.Secp256k1())
+            Secp256k1Net.Secp256k1 dsa = context?.Context as Secp256k1Net.Secp256k1;
+            if (dsa == null)
             {
-                return secp256k1.Verify(signature.Data, data, key.PublicKey);
+                dsa = new Secp256k1Net.Secp256k1();
             }
-        }
 
-        public bool VerifyHash(Span<byte> hash, Signature signature, Key key)
-        {
-            using (var secp256k1 = new Secp256k1Net.Secp256k1())
+            try
             {
-                return secp256k1.Verify(signature.Data, hash, key.PublicKey);
+                return dsa.Verify(signature.Data, hash, key.PublicKey);
+            }
+            finally
+            {
+                if (context == null)
+                    dsa?.Dispose();
             }
         }
     }

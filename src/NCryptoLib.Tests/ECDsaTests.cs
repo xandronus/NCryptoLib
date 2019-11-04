@@ -33,8 +33,15 @@ namespace NCryptoLib.Tests
         [Fact]
         public void TestSecp256k1RSAccessors()
         {
-            var signer = new MsftECDsaCng();
+            var signer = new Secp256k1DotNet();
             this.TestRSAccessors(signer);
+        }
+
+        [Fact]
+        public void TestSharedContext()
+        {
+            // TODO: Write a test that tests that can used a shared context
+            // on ECDsa routines
         }
 
         private void TestRSAccessors(IECDsa signer)
