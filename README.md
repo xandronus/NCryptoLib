@@ -10,6 +10,7 @@ Currently targeting C# 8 and .NET Core 3.0 only
 |       | MsftECDsaCng | Microsofts ECDSA algo. |
 | IHasher |                 | Hashing Algorithms |
 |       | MsftHasher | Microsofts SHA256Managed algo. |
+
 _Project is currently in development - no published packages or CI at this time._
 
 ### **Contributions and suggestions welcome!** ###
