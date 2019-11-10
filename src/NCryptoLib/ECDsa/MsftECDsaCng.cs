@@ -69,7 +69,7 @@ namespace NCryptoLib.ECDsa
         {
             try
             {
-                using (ConvertToCngKey(key))
+                using (key.ToECDsaCngKey())
                 {
                     return true;
                 }
@@ -85,7 +85,7 @@ namespace NCryptoLib.ECDsa
             ECDsaCng dsa = context?.Context as ECDsaCng;
             if (dsa == null)
             {
-                dsa = ConvertToCngKey(key);
+                dsa = key.ToECDsaCngKey();
             }
 
             try
@@ -105,7 +105,7 @@ namespace NCryptoLib.ECDsa
             ECDsaCng dsa = context?.Context as ECDsaCng;
             if (dsa == null)
             {
-                dsa = ConvertToCngKey(key);
+                dsa = key.ToECDsaCngKey();
             }
             
             try
@@ -126,7 +126,7 @@ namespace NCryptoLib.ECDsa
             ECDsaCng dsa = context?.Context as ECDsaCng;
             if (dsa == null)
             {
-                dsa = ConvertToCngKey(key);
+                dsa = key.ToECDsaCngKey();
             }
 
             try
@@ -145,7 +145,7 @@ namespace NCryptoLib.ECDsa
             ECDsaCng dsa = context?.Context as ECDsaCng;
             if (dsa == null)
             {
-                dsa = ConvertToCngKey(key);
+                dsa = key.ToECDsaCngKey();
             }
 
             try
@@ -172,18 +172,7 @@ namespace NCryptoLib.ECDsa
 
             var cngKey = CngKey.Import(keyImport, CngKeyBlobFormat.EccPrivateBlob);
             return new ECDsaCng(cngKey);
-        }
-
-        /// <summary>
-        /// Creates a CngKey from a public key
-        /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        public static ECDsaCng ConvertToCngKey(Key key)
-        {
-            // TODO: Look at moving this to an extension method?
-            return new ECDsaCng(CngKey.Import(ConvertToCngKeyData(key), CngKeyBlobFormat.EccPrivateBlob));
-        }
+        }       
 
         // https://stackoverflow.com/questions/24251336/import-a-public-key-from-somewhere-else-to-cngkey
         public static byte[] ConvertToCngKeyData(Key key)

@@ -16,7 +16,7 @@ namespace NCryptoLib.ECDsa
         /// <param name="key">Private/Public key pair</param>
         public MsftECDsaContext(Key key) : base(null)
         {
-            base.Context = MsftECDsaCng.ConvertToCngKey(key);
+            base.Context = key.ToECDsaCngKey();
         }
 
         public void Dispose()

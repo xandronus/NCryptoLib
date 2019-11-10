@@ -38,10 +38,43 @@ namespace NCryptoLib.Tests
         }
 
         [Fact]
-        public void TestSharedContext()
+        public void TestMsftSharedContext()
         {
-            // TODO: Write a test that tests that can used a shared context
-            // on ECDsa routines
+            IECDsa signer = new MsftECDsaCng();
+            var key = signer.CreateKey();
+
+            using (var context = new MsftECDsaContext(key))
+            {
+                TestMultipleSigns(signer, key, 1000, context);
+            }                
+        }
+
+        [Fact]
+        public void TestSecp256k1SharedContext()
+        {
+            using var secp256k1 = new Secp256k1Net.Secp256k1();
+
+            using (var context = new Secp256k1DotNetContext(secp256k1))
+            {
+                IECDsa signer = new Secp256k1DotNet();
+                var key = signer.CreateKey();
+                
+                TestMultipleSigns(signer, key, 1000, context);
+            }
+        }
+
+        private void TestMultipleSigns(IECDsa signer, Key key, int count, ECDsaContext context)
+        {
+            for (var loop = 0; loop < count; loop++)
+            {
+                using var rnd = RandomNumberGenerator.Create();
+
+                var data = new byte[32];
+                rnd.GetBytes(data);
+                var signature = signer.SignData(data, key, context);
+                if (!signer.VerifyData(data, signature, key, context))
+                    throw new Exception();
+            }
         }
 
         private void TestRSAccessors(IECDsa signer)
