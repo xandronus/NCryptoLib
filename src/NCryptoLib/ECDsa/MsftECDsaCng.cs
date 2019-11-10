@@ -11,7 +11,7 @@ namespace NCryptoLib.ECDsa
     /// </summary>
     public class MsftECDsaCng : IECDsa
     {        
-        public Span<byte> CreateSecret(ECDsaContext context = null)
+        public Span<byte> CreateSecret(DisposableContext context = null)
         {
             ECDsaCng dsa = context?.Context as ECDsaCng;
             if (dsa == null)
@@ -35,12 +35,12 @@ namespace NCryptoLib.ECDsa
             }
         }
 
-        public Key CreatePrivateKey(ECDsaContext context = null)
+        public Key CreatePrivateKey(DisposableContext context = null)
         {
             return this.CreateKey(context);
         }
 
-        public Key CreateKey(ECDsaContext context = null)
+        public Key CreateKey(DisposableContext context = null)
         {
             ECDsaCng dsa = context?.Context as ECDsaCng;
             if (dsa == null)
@@ -64,7 +64,7 @@ namespace NCryptoLib.ECDsa
             }
         }
 
-        public bool IsPrivateKeyValid(Key key, ECDsaContext context = null)
+        public bool IsPrivateKeyValid(Key key, DisposableContext context = null)
         {
             try
             {
@@ -79,7 +79,7 @@ namespace NCryptoLib.ECDsa
             }
         }
 
-        public Signature SignData(byte[] data, Key key, ECDsaContext context = null)
+        public Signature SignData(byte[] data, Key key, DisposableContext context = null)
         {
             ECDsaCng dsa = context?.Context as ECDsaCng;
             if (dsa == null)
@@ -99,7 +99,7 @@ namespace NCryptoLib.ECDsa
             }
         }
 
-        public Signature SignData(byte[] data, ECDsaContext context)
+        public Signature SignData(byte[] data, DisposableContext context)
         {
             var dsa = context?.Context as ECDsaCng;
             if (dsa == null)
@@ -109,7 +109,7 @@ namespace NCryptoLib.ECDsa
             return new Signature { Data = signature };
         }
 
-        public Signature SignHash(Span<byte> hash, ECDsaContext context)
+        public Signature SignHash(Span<byte> hash, DisposableContext context)
         {
             var dsa = context?.Context as ECDsaCng;
             if (dsa == null)
@@ -120,7 +120,7 @@ namespace NCryptoLib.ECDsa
             return new Signature { Data = signature };
         }
 
-        public Signature SignHash(Span<byte> hash, Key key, ECDsaContext context = null)
+        public Signature SignHash(Span<byte> hash, Key key, DisposableContext context = null)
         {
             ECDsaCng dsa = context?.Context as ECDsaCng;
             if (dsa == null)
@@ -141,7 +141,7 @@ namespace NCryptoLib.ECDsa
             }           
         }
 
-        public bool VerifyData(byte[] data, Signature signature, Key key, ECDsaContext context = null)
+        public bool VerifyData(byte[] data, Signature signature, Key key, DisposableContext context = null)
         {
             ECDsaCng dsa = context?.Context as ECDsaCng;
             if (dsa == null)
@@ -160,7 +160,7 @@ namespace NCryptoLib.ECDsa
             }  
         }
 
-        public bool VerifyData(byte[] data, Signature signature, ECDsaContext context)
+        public bool VerifyData(byte[] data, Signature signature, DisposableContext context)
         {
             var dsa = context?.Context as ECDsaCng;
             if (dsa == null)
@@ -169,7 +169,7 @@ namespace NCryptoLib.ECDsa
             return dsa.VerifyData(data, signature.Data.ToArray());
         }
 
-        public bool VerifyHash(Span<byte> hash, Signature signature, Key key, ECDsaContext context = null)
+        public bool VerifyHash(Span<byte> hash, Signature signature, Key key, DisposableContext context = null)
         {
             ECDsaCng dsa = context?.Context as ECDsaCng;
             if (dsa == null)
@@ -188,7 +188,7 @@ namespace NCryptoLib.ECDsa
             } 
         }
 
-        public bool VerifyHash(Span<byte> hash, Signature signature, ECDsaContext context)
+        public bool VerifyHash(Span<byte> hash, Signature signature, DisposableContext context)
         {
             var dsa = context?.Context as ECDsaCng;
             if (dsa == null)

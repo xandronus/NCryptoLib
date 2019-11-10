@@ -5,7 +5,7 @@ using System.Text;
 
 namespace NCryptoLib.ECDsa
 {
-    public sealed class MsftECDsaContext : ECDsaContext, IDisposable
+    public sealed class MsftECDsaContext : DisposableContext, IDisposable
     {
         public MsftECDsaContext(ECDsaCng context) : base(context)
         { }

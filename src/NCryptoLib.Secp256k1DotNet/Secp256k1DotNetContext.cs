@@ -1,12 +1,11 @@
-﻿using NCryptoLib.ECDsa;
-using Secp256k1Net;
+﻿using Secp256k1Net;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace NCryptoLib.ECDsa
 {
-    public sealed class Secp256k1DotNetContext : ECDsaContext, IDisposable
+    public sealed class Secp256k1DotNetContext : DisposableContext, IDisposable
     {
         public Secp256k1DotNetContext(Secp256k1 context): base(context)
         {

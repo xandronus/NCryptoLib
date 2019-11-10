@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Numerics;
 using System.Security.Cryptography;
+using FluentAssertions;
 using Xunit;
 
 namespace NCryptoLib.Tests
@@ -13,7 +14,7 @@ namespace NCryptoLib.Tests
         public void TestSecp256k1SignAndVerify()
         {
             var signer = new Secp256k1DotNet();
-            var signature = this.TestSign(signer);
+            var signature = this.TestSign(signer);         
         }
 
         [Fact]

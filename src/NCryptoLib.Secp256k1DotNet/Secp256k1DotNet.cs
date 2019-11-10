@@ -15,12 +15,12 @@ namespace NCryptoLib.ECDsa
         public const int PublicKeyLength = Secp256k1Net.Secp256k1.PUBKEY_LENGTH;
         public const int HashLength = Secp256k1Net.Secp256k1.HASH_LENGTH;
 
-        public Span<byte> CreateSecret(ECDsaContext context = null)
+        public Span<byte> CreateSecret(DisposableContext context = null)
         {
             return ECDsaKeyGen.CreatePrivateKey(this);
         }
 
-        public Key CreatePrivateKey(ECDsaContext context = null)
+        public Key CreatePrivateKey(DisposableContext context = null)
         {
             return new Key
             {
@@ -29,7 +29,7 @@ namespace NCryptoLib.ECDsa
             };
         }
 
-        public bool IsPrivateKeyValid(Key key, ECDsaContext context = null)
+        public bool IsPrivateKeyValid(Key key, DisposableContext context = null)
         {
             Secp256k1Net.Secp256k1 dsa = context?.Context as Secp256k1Net.Secp256k1;
             if (dsa == null)
@@ -48,7 +48,7 @@ namespace NCryptoLib.ECDsa
             }
         }
 
-        public Key CreateKey(ECDsaContext context = null)
+        public Key CreateKey(DisposableContext context = null)
         {
             Secp256k1Net.Secp256k1 dsa = context?.Context as Secp256k1Net.Secp256k1;
             if (dsa == null)
@@ -71,7 +71,7 @@ namespace NCryptoLib.ECDsa
             }
         }
 
-        public Signature SignData(byte[] data, Key key, ECDsaContext context = null)
+        public Signature SignData(byte[] data, Key key, DisposableContext context = null)
         {
             //TODO: hash and then sign
             if (data.Length > HashLength)
@@ -79,7 +79,7 @@ namespace NCryptoLib.ECDsa
             return this.SignHash(data, key, context);
         }
 
-        public Signature SignData(byte[] data, ECDsaContext context)
+        public Signature SignData(byte[] data, DisposableContext context)
         {
             //TODO: hash and then sign
             if (data.Length > HashLength)
@@ -87,12 +87,12 @@ namespace NCryptoLib.ECDsa
             return this.SignHash(data, context);
         }
 
-        public Signature SignHash(Span<byte> hash, ECDsaContext context)
+        public Signature SignHash(Span<byte> hash, DisposableContext context)
         {
             throw new CryptoException($"{nameof(Secp256k1DotNet)} requires key, use the method with it as a parameter.");
         }
 
-        public Signature SignHash(Span<byte> hash, Key key, ECDsaContext context = null)
+        public Signature SignHash(Span<byte> hash, Key key, DisposableContext context = null)
         {
             Secp256k1Net.Secp256k1 dsa = context?.Context as Secp256k1Net.Secp256k1;
             if (dsa == null)
@@ -114,7 +114,7 @@ namespace NCryptoLib.ECDsa
             }
         }
 
-        public bool VerifyData(byte[] data, Signature signature, Key key, ECDsaContext context = null)
+        public bool VerifyData(byte[] data, Signature signature, Key key, DisposableContext context = null)
         {
             //TODO: hash and then verify
             if (data.Length > HashLength)
@@ -122,14 +122,15 @@ namespace NCryptoLib.ECDsa
             return this.VerifyHash(data, signature, key, context);
         }
 
-        public bool VerifyData(byte[] data, Signature signature, ECDsaContext context)
+        public bool VerifyData(byte[] data, Signature signature, DisposableContext context)
         {
+            //TODO: hash and then verify
             if (data.Length > HashLength)
                 throw new CryptoException($"{nameof(Secp256k1DotNet)} currently only supports verifying hashes.");
             return this.VerifyHash(data, signature, context);
         }
 
-        public bool VerifyHash(Span<byte> hash, Signature signature, Key key, ECDsaContext context = null)
+        public bool VerifyHash(Span<byte> hash, Signature signature, Key key, DisposableContext context = null)
         {
             Secp256k1Net.Secp256k1 dsa = context?.Context as Secp256k1Net.Secp256k1;
             if (dsa == null)
@@ -148,7 +149,7 @@ namespace NCryptoLib.ECDsa
             }
         }
 
-        public bool VerifyHash(Span<byte> hash, Signature signature, ECDsaContext context)
+        public bool VerifyHash(Span<byte> hash, Signature signature, DisposableContext context)
         {
             throw new CryptoException($"{nameof(Secp256k1DotNet)} requires key, use the method with it as a parameter.");
         }

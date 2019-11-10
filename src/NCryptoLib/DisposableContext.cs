@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace NCryptoLib.ECDsa
+namespace NCryptoLib
 {
-    public class ECDsaContext
+    public class DisposableContext
     {
-        public ECDsaContext(object context)
+        public DisposableContext(object context)
         {
-            this.Context = context;
+            Context = context;
         }
 
         public object Context { get; protected set; }
