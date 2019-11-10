@@ -10,8 +10,7 @@ namespace NCryptoLib.ECDsa
     /// Uses Microsofts ECDsaCng in System.Security.Cryptography
     /// </summary>
     public class MsftECDsaCng : IECDsa
-    {
-        
+    {        
         public Span<byte> CreateSecret(ECDsaContext context = null)
         {
             ECDsaCng dsa = context?.Context as ECDsaCng;
@@ -100,6 +99,27 @@ namespace NCryptoLib.ECDsa
             }
         }
 
+        public Signature SignData(byte[] data, ECDsaContext context)
+        {
+            var dsa = context?.Context as ECDsaCng;
+            if (dsa == null)
+                throw new CryptoException($"A context is required for {nameof(MsftECDsaCng)}");
+
+            byte[] signature = dsa.SignData(data);
+            return new Signature { Data = signature };
+        }
+
+        public Signature SignHash(Span<byte> hash, ECDsaContext context)
+        {
+            var dsa = context?.Context as ECDsaCng;
+            if (dsa == null)
+                throw new CryptoException($"A context is required for {nameof(MsftECDsaCng)}");
+ 
+            byte[] signature = dsa.SignHash(hash.ToArray());
+
+            return new Signature { Data = signature };
+        }
+
         public Signature SignHash(Span<byte> hash, Key key, ECDsaContext context = null)
         {
             ECDsaCng dsa = context?.Context as ECDsaCng;
@@ -140,6 +160,15 @@ namespace NCryptoLib.ECDsa
             }  
         }
 
+        public bool VerifyData(byte[] data, Signature signature, ECDsaContext context)
+        {
+            var dsa = context?.Context as ECDsaCng;
+            if (dsa == null)
+                throw new CryptoException($"A context is required for {nameof(MsftECDsaCng)}");
+
+            return dsa.VerifyData(data, signature.Data.ToArray());
+        }
+
         public bool VerifyHash(Span<byte> hash, Signature signature, Key key, ECDsaContext context = null)
         {
             ECDsaCng dsa = context?.Context as ECDsaCng;
@@ -157,6 +186,15 @@ namespace NCryptoLib.ECDsa
                 if (context == null)
                     dsa?.Dispose();
             } 
+        }
+
+        public bool VerifyHash(Span<byte> hash, Signature signature, ECDsaContext context)
+        {
+            var dsa = context?.Context as ECDsaCng;
+            if (dsa == null)
+                throw new CryptoException($"A context is required for {nameof(MsftECDsaCng)}");
+
+            return dsa.VerifyHash(hash.ToArray(), signature.Data.ToArray());
         }
 
         public static ECDsaCng ConvertToCng(Key key)

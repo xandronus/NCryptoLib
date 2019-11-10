@@ -38,19 +38,28 @@ namespace NCryptoLib.Tests
         }
 
         [Fact]
-        public void TestMsftSharedContext()
+        public void TestMsftSharedContextWithSameKey()
         {
             IECDsa signer = new MsftECDsaCng();
             var key = signer.CreateKey();
 
             using (var context = new MsftECDsaContext(key))
             {
-                TestMultipleSigns(signer, key, 1000, context);
+                for (var loop = 0; loop < 1000; loop++)
+                {
+                    using var rnd = RandomNumberGenerator.Create();
+
+                    var data = new byte[32];
+                    rnd.GetBytes(data);
+                    var signature = signer.SignHash(data, context);
+                    if (!signer.VerifyHash(data, signature, context))
+                        throw new Exception();
+                }
             }                
         }
 
         [Fact]
-        public void TestSecp256k1SharedContext()
+        public void TestSecp256k1UseSharedContextWithSameKey()
         {
             using var secp256k1 = new Secp256k1Net.Secp256k1();
 
@@ -58,22 +67,17 @@ namespace NCryptoLib.Tests
             {
                 IECDsa signer = new Secp256k1DotNet();
                 var key = signer.CreateKey();
-                
-                TestMultipleSigns(signer, key, 1000, context);
-            }
-        }
 
-        private void TestMultipleSigns(IECDsa signer, Key key, int count, ECDsaContext context)
-        {
-            for (var loop = 0; loop < count; loop++)
-            {
-                using var rnd = RandomNumberGenerator.Create();
+                for (var loop = 0; loop < 1000; loop++)
+                {
+                    using var rnd = RandomNumberGenerator.Create();
 
-                var data = new byte[32];
-                rnd.GetBytes(data);
-                var signature = signer.SignData(data, key, context);
-                if (!signer.VerifyData(data, signature, key, context))
-                    throw new Exception();
+                    var data = new byte[32];
+                    rnd.GetBytes(data);
+                    var signature = signer.SignHash(data, key, context);
+                    if (!signer.VerifyHash(data, signature, key, context))
+                        throw new Exception();
+                }
             }
         }
 

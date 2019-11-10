@@ -15,7 +15,9 @@ namespace NCryptoLib
         /// <returns>ECDsaCng Key</returns>
         public static ECDsaCng ToECDsaCngKey(this Key key)
         {
-            return new ECDsaCng(CngKey.Import(MsftECDsaCng.ConvertToCngKeyData(key), CngKeyBlobFormat.EccPrivateBlob));
+            var dsa = new ECDsaCng(CngKey.Import(MsftECDsaCng.ConvertToCngKeyData(key), CngKeyBlobFormat.EccPrivateBlob));
+            dsa.HashAlgorithm = CngAlgorithm.Sha256;
+            return dsa;
         }
     }
 }
