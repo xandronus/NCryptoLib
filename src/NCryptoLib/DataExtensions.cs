@@ -7,6 +7,11 @@ namespace NCryptoLib
 {
     public static class DataExtensions
     {
+        /// <summary>
+        /// Computes a hash of an array of bytes
+        /// </summary>
+        /// <param name="data">array of bytes</param>
+        /// <returns>the hash</returns>
         public static Hash256 Hash(this byte[] data)
         {
             MsftHasher hasher = new MsftHasher();
