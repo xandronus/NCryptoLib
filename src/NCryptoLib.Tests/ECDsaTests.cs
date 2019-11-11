@@ -52,8 +52,9 @@ namespace NCryptoLib.Tests
 
                     var data = new byte[32];
                     rnd.GetBytes(data);
-                    var signature = signer.SignHash(data, context);
-                    if (!signer.VerifyHash(data, signature, context))
+                    var hash = data.Hash();
+                    var signature = signer.SignHash(hash, context);
+                    if (!signer.VerifyHash(hash, signature, context))
                         throw new Exception();
                 }
             }                
@@ -75,8 +76,9 @@ namespace NCryptoLib.Tests
 
                     var data = new byte[32];
                     rnd.GetBytes(data);
-                    var signature = signer.SignHash(data, key, context);
-                    if (!signer.VerifyHash(data, signature, key, context))
+                    var hash = data.Hash();
+                    var signature = signer.SignHash(hash, key, context);
+                    if (!signer.VerifyHash(hash, signature, key, context))
                         throw new Exception();
                 }
             }
@@ -92,10 +94,10 @@ namespace NCryptoLib.Tests
             var R = signature.GetR();
             var S = signature.GetS();
 
-            Signature RS = new Signature { Data = new byte[64] };
+            Signature RS = new Signature { Bytes = new byte[64] };
             RS.Set(R, S);
 
-            Assert.Equal(signature.Data.ToArray(), RS.Data.ToArray());
+            Assert.Equal(signature.Bytes.ToArray(), RS.Bytes.ToArray());
         }
 
         private Signature TestSign(IECDsa signer)
@@ -103,7 +105,7 @@ namespace NCryptoLib.Tests
             Key key = signer.CreateKey();
             using var rnd = RandomNumberGenerator.Create();
 
-            var data = new byte[32];
+            var data = new byte[256];
             rnd.GetBytes(data);
             var signature = signer.SignData(data, key);
             if (signer.VerifyData(data, signature, key))

@@ -11,7 +11,7 @@ namespace NCryptoLib
         /// </summary>
         public static string ToHexString(this Span<byte> span)
         {
-            return "0x" + BitConverter.ToString(span.ToArray()).Replace("-", "").ToLowerInvariant();
+            return BitConverter.ToString(span.ToArray()).Replace("-", "").ToLowerInvariant();
         }
 
         /// <summary>

@@ -90,7 +90,7 @@ namespace NCryptoLib.ECDsa
             try
             { 
                 byte[] signature = dsa.SignData(data);
-                return new Signature { Data = signature };
+                return new Signature { Bytes = signature };
             }
             finally
             {
@@ -106,21 +106,21 @@ namespace NCryptoLib.ECDsa
                 throw new CryptoException($"A context is required for {nameof(MsftECDsaCng)}");
 
             byte[] signature = dsa.SignData(data);
-            return new Signature { Data = signature };
+            return new Signature { Bytes = signature };
         }
 
-        public Signature SignHash(Span<byte> hash, DisposableContext context)
+        public Signature SignHash(Hash256 hash, DisposableContext context)
         {
             var dsa = context?.Context as ECDsaCng;
             if (dsa == null)
                 throw new CryptoException($"A context is required for {nameof(MsftECDsaCng)}");
  
-            byte[] signature = dsa.SignHash(hash.ToArray());
+            byte[] signature = dsa.SignHash(hash.Bytes.ToArray());
 
-            return new Signature { Data = signature };
+            return new Signature { Bytes = signature };
         }
 
-        public Signature SignHash(Span<byte> hash, Key key, DisposableContext context = null)
+        public Signature SignHash(Hash256 hash, Key key, DisposableContext context = null)
         {
             ECDsaCng dsa = context?.Context as ECDsaCng;
             if (dsa == null)
@@ -130,9 +130,9 @@ namespace NCryptoLib.ECDsa
             
             try
             {                
-                byte[] signature = dsa.SignHash(hash.ToArray());
+                byte[] signature = dsa.SignHash(hash.Bytes.ToArray());
 
-                return new Signature { Data = signature };
+                return new Signature { Bytes = signature };
             }
             finally
             {
@@ -151,7 +151,7 @@ namespace NCryptoLib.ECDsa
 
             try
             {
-                return dsa.VerifyData(data, signature.Data.ToArray());
+                return dsa.VerifyData(data, signature.Bytes.ToArray());
             }
             finally
             {
@@ -166,10 +166,10 @@ namespace NCryptoLib.ECDsa
             if (dsa == null)
                 throw new CryptoException($"A context is required for {nameof(MsftECDsaCng)}");
 
-            return dsa.VerifyData(data, signature.Data.ToArray());
+            return dsa.VerifyData(data, signature.Bytes.ToArray());
         }
 
-        public bool VerifyHash(Span<byte> hash, Signature signature, Key key, DisposableContext context = null)
+        public bool VerifyHash(Hash256 hash, Signature signature, Key key, DisposableContext context = null)
         {
             ECDsaCng dsa = context?.Context as ECDsaCng;
             if (dsa == null)
@@ -179,7 +179,7 @@ namespace NCryptoLib.ECDsa
 
             try
             {
-                return dsa.VerifyHash(hash, signature.Data.ToArray());
+                return dsa.VerifyHash(hash.Bytes, signature.Bytes.ToArray());
             }
             finally
             {
@@ -188,13 +188,13 @@ namespace NCryptoLib.ECDsa
             } 
         }
 
-        public bool VerifyHash(Span<byte> hash, Signature signature, DisposableContext context)
+        public bool VerifyHash(Hash256 hash, Signature signature, DisposableContext context)
         {
             var dsa = context?.Context as ECDsaCng;
             if (dsa == null)
                 throw new CryptoException($"A context is required for {nameof(MsftECDsaCng)}");
 
-            return dsa.VerifyHash(hash.ToArray(), signature.Data.ToArray());
+            return dsa.VerifyHash(hash.Bytes, signature.Bytes.ToArray());
         }
 
         public static ECDsaCng ConvertToCng(Key key)

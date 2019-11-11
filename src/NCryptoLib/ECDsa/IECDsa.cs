@@ -39,7 +39,7 @@ namespace NCryptoLib.ECDsa
         /// <param name="context">ECDsa context</param>
         /// <returns>the signature</returns>
         /// <exception cref="CryptoException">thrown if attempted on <see cref="Secp256k1DotNet"/></exception>
-        public Signature SignHash(Span<byte> hash, DisposableContext context);
+        public Signature SignHash(Hash256 hash, DisposableContext context);
 
         /// <summary>
         /// Signs the hash - with the given key
@@ -49,7 +49,7 @@ namespace NCryptoLib.ECDsa
         /// <param name="key">key to sign with</param>
         /// <param name="context">optional context</param>
         /// <returns>The signature</returns>
-        public Signature SignHash(Span<byte> hash, Key key, DisposableContext context = null);
+        public Signature SignHash(Hash256 hash, Key key, DisposableContext context = null);
 
         /// <summary>
         /// Verify the data signature by computing SHA-256 hash and then verify the hash signature - with the given key
@@ -82,7 +82,7 @@ namespace NCryptoLib.ECDsa
         /// <param name="key">key to use for verification</param>
         /// <param name="context">optional context</param>
         /// <returns>true if valid signature, false if not</returns>
-        public bool VerifyHash(Span<byte> hash, Signature signature, Key key, DisposableContext context = null);
+        public bool VerifyHash(Hash256 hash, Signature signature, Key key, DisposableContext context = null);
 
         /// <summary>
         /// Verify the signature of a hash - key is assumed to be in the context
@@ -93,6 +93,6 @@ namespace NCryptoLib.ECDsa
         /// <param name="context">context containing key</param>
         /// <returns>true if valid signature, false if not</returns>
         /// <exception cref="CryptoException">thrown if attempted on <see cref="Secp256k1DotNet"/></exception>
-        public bool VerifyHash(Span<byte> hash, Signature signature, DisposableContext context);
+        public bool VerifyHash(Hash256 hash, Signature signature, DisposableContext context);
     }
 }
