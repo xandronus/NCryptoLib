@@ -20,6 +20,16 @@ namespace NCryptoLib.Tests
         }
 
         [Fact]
+        public void TestRIPEMD160()
+        {
+            MsftHasher hasher = new MsftHasher();
+            string input = "t6MJu}q<&4Krk,9<";
+            const string expectedHash = "2664bb6bac1c8f6197e08fbea6f05e5b49bbcf42";
+            var hash = hasher.RIPEMD160(input.HashOfText());
+            expectedHash.Should().BeEquivalentTo(hash.ToHexString());
+        }
+
+        [Fact]
         public void TestHash256Equality()
         {
             const string expectedHash = "EC69618987A118C309AF5C1E880A28366865794C40769345EB3D6D0CFA8681BB";

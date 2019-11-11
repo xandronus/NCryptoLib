@@ -18,6 +18,28 @@ namespace NCryptoLib
             var dsa = new ECDsaCng(CngKey.Import(MsftECDsaCng.ConvertToCngKeyData(key), CngKeyBlobFormat.EccPrivateBlob));
             dsa.HashAlgorithm = CngAlgorithm.Sha256;
             return dsa;
+        
+        }
+
+        /// <summary>
+        /// Gets the public key hash of the key
+        /// </summary>
+        /// <param name="key">key</param>
+        /// <returns></returns>
+        public static Hash160 ToPublicKeyHash(this Key key)
+        {
+            return key.PublicKey.Hash().RIPEMD160();
+        }
+
+        /// <summary>
+        /// Gets the Bitcoin P2PKHAddress of this key
+        /// RIPEMD160(SHA256(pubkey))
+        /// </summary>
+        /// <param name="key">Key to get bitcoin address for</param>
+        /// <returns>Base58Check encoded address</returns>
+        public static string GetBitcoinP2PKHAddress(this Key key)
+        {
+            return key.ToPublicKeyHash().ToP2PKHAddress(Bitcoin.Network.MainNet.P2PKHAddressVersion);
         }
     }
 }

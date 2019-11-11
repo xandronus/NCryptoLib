@@ -17,5 +17,16 @@ namespace NCryptoLib
             MsftHasher hasher = new MsftHasher();
             return hasher.SHA256(data, 0, data.Length);
         }
+
+        /// <summary>
+        /// Computes a hash of an array of bytes
+        /// </summary>
+        /// <param name="data">array of bytes</param>
+        /// <returns>the hash</returns>
+        public static Hash256 Hash(this Span<byte> data)
+        {
+            MsftHasher hasher = new MsftHasher();
+            return hasher.SHA256(data.ToArray(), 0, data.Length);
+        }
     }
 }
