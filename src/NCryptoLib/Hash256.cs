@@ -14,6 +14,11 @@ namespace NCryptoLib
             Bytes = bytes;
         }
 
+        public Hash256(Span<byte> bytes)
+        {
+            Bytes = bytes;
+        }
+
         public Span<byte> Bytes;
 
         public static bool operator ==(Hash256 left, Hash256 right)

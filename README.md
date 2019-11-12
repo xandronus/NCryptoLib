@@ -9,7 +9,20 @@ Currently targeting C# 8 and .NET Core 3.0 only
 |       | Secp2561kDotNet | Bitcoin ECDSA algo. |
 |       | MsftECDsaCng | Microsofts ECDSA algo. |
 | IHasher |                 | Hashing Algorithms |
-|       | MsftHasher | Microsofts SHA256Managed algo. |
+|       | MsftHasher | Microsofts SHA256 and RIPEMD160 hash algo. |
+
+Library is optimized to use span and stack allocations over heap objects for performance
+
+Sample code to get a P2PKH bitcoin address from a private key:
+
+```c#
+// Example address from https://en.bitcoin.it/wiki/Technical_background_of_version_1_Bitcoin_addresses
+var privateKey = "18e14a7b6a307f426a94f8114701e7c8e774e7f9a47e2c2035db29a206321725".HexToBytes();
+IECDsa ecdsa = new Secp256k1DotNet();
+var key = ecdsa.CreateKey(privateKey);
+string p2pkhAddress = Address.GetP2PKHAddress(key, ecdsa, Bitcoin.Network.MainNet.P2PKHAddressVersion);
+// returns "1PMycacnJaSqwwJqjawXBErnLsZ7RkXUAs"
+```
 
 _Project is currently in development - no published packages or CI at this time._
 

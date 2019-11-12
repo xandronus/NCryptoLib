@@ -10,6 +10,7 @@ namespace NCryptoLib.ECDsa
         public Span<byte> CreateSecret(DisposableContext context = null);
         public Key CreatePrivateKey(DisposableContext context = null);
         public Key CreateKey(DisposableContext context = null);
+        public Key CreateKey(Span<byte> privateKey, DisposableContext context = null);
         public bool IsPrivateKeyValid(Key key, DisposableContext context = null);
         
         /// <summary>
@@ -94,5 +95,22 @@ namespace NCryptoLib.ECDsa
         /// <returns>true if valid signature, false if not</returns>
         /// <exception cref="CryptoException">thrown if attempted on <see cref="Secp256k1DotNet"/></exception>
         public bool VerifyHash(Hash256 hash, Signature signature, DisposableContext context);
+
+        /// <summary>
+        /// Creates a public key from a private key
+        /// </summary>
+        /// <param name="privateKey">source private key</param>
+        /// <param name="context">optional context</param>
+        /// <returns>the public key, exception if can't create it</returns>
+        /// <exception cref="CryptoException">when public key can't be created</exception>
+        public Span<byte> CreatePublicKey(Span<byte> privateKey, DisposableContext context = null);
+
+        /// <summary>
+        /// Derives the compressed public key from the uncompressed public key
+        /// </summary>
+        /// <param name="uncompressed">uncompressed public key (64 bytes)</param>
+        /// <param name="context">optional context</param>
+        /// <returns>compressed public key 33 bytes</returns>
+        public Span<byte> CompressPublicKey(Span<byte> uncompressed, DisposableContext context = null);
     }
 }

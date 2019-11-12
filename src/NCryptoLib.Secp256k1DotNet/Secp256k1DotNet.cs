@@ -14,6 +14,7 @@ namespace NCryptoLib.ECDsa
     {
         public const int SignatureLength = Secp256k1Net.Secp256k1.SIGNATURE_LENGTH;
         public const int PublicKeyLength = Secp256k1Net.Secp256k1.PUBKEY_LENGTH;
+        public const int PublicKeyCompressedLength = Secp256k1Net.Secp256k1.SERIALIZED_COMPRESSED_PUBKEY_LENGTH;
         public const int HashLength = Secp256k1Net.Secp256k1.HASH_LENGTH;
 
         public Span<byte> CreateSecret(DisposableContext context = null)
@@ -28,6 +29,50 @@ namespace NCryptoLib.ECDsa
                 PrivateKey = this.CreateSecret(context),
                 PublicKey = null
             };
+        }
+
+        public Span<byte> CompressPublicKey(Span<byte> uncompressed, DisposableContext context = null)
+        {
+            Secp256k1Net.Secp256k1 dsa = context?.Context as Secp256k1Net.Secp256k1;
+            if (dsa == null)
+            {
+                dsa = new Secp256k1Net.Secp256k1();
+            }
+
+            try
+            {
+                Span<byte> compressed = new byte[PublicKeyCompressedLength];
+                if (!dsa.PublicKeySerialize(compressed, uncompressed, Secp256k1Net.Flags.SECP256K1_EC_COMPRESSED))
+                    throw new CryptoException("Can't create public compressed key from uncompressed key");
+                return compressed;
+            }
+            finally
+            {
+                if (context == null)
+                    dsa?.Dispose();
+            }
+        }
+
+        public Span<byte> CreatePublicKey(Span<byte> privateKey, DisposableContext context = null)
+        {
+            Secp256k1Net.Secp256k1 dsa = context?.Context as Secp256k1Net.Secp256k1;
+            if (dsa == null)
+            {
+                dsa = new Secp256k1Net.Secp256k1();
+            }
+
+            try
+            {
+                Span<byte> publicKey = new byte[PublicKeyLength];
+                if (!dsa.PublicKeyCreate(publicKey, privateKey))
+                    throw new CryptoException("Can't create public key from private key");
+                return publicKey;
+            }
+            finally
+            {
+                if (context == null)
+                    dsa?.Dispose();
+            }
         }
 
         public bool IsPrivateKeyValid(Key key, DisposableContext context = null)
@@ -70,6 +115,11 @@ namespace NCryptoLib.ECDsa
                 if (context == null)
                     dsa?.Dispose();
             }
+        }
+
+        public Key CreateKey(Span<byte> privateKey, DisposableContext context = null)
+        {
+            return new Key { PrivateKey = privateKey, PublicKey = this.CreatePublicKey(privateKey, context) };
         }
 
         public Signature SignData(byte[] data, Key key, DisposableContext context = null)

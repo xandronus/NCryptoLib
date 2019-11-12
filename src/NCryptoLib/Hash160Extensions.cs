@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NCryptoLib.Bitcoin;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -36,8 +37,10 @@ namespace NCryptoLib
         /// <returns>base58check address</returns>
         public static string ToP2PKHAddress(this Hash160 hash, Span<byte> versionBytes)
         {
-            // TODO: Write base58check encoder
-            return null;
+            Span<byte> data = new byte[versionBytes.Length + hash.Bytes.Length];
+            versionBytes.CopyTo(data);
+            hash.Bytes.CopyTo(data.Slice(versionBytes.Length, hash.Bytes.Length));
+            return Base58CheckEncoding.Encode(data);
         }
     }
 }

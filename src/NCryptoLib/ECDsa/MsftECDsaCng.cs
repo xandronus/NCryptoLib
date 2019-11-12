@@ -64,6 +64,11 @@ namespace NCryptoLib.ECDsa
             }
         }
 
+        public Key CreateKey(Span<byte> privateKey, DisposableContext context = null)
+        {
+            return new Key { PrivateKey = privateKey, PublicKey = this.CreatePublicKey(privateKey, context) };
+        }
+
         public bool IsPrivateKeyValid(Key key, DisposableContext context = null)
         {
             try
@@ -195,6 +200,18 @@ namespace NCryptoLib.ECDsa
                 throw new CryptoException($"A context is required for {nameof(MsftECDsaCng)}");
 
             return dsa.VerifyHash(hash.Bytes, signature.Bytes.ToArray());
+        }
+
+        public Span<byte> CreatePublicKey(Span<byte> privateKey, DisposableContext context = null)
+        {
+            // TODO: Implement MSFT public key generation
+            throw new NotImplementedException();
+        }
+
+        public Span<byte> CompressPublicKey(Span<byte> uncompressed, DisposableContext context = null)
+        {
+            // TODO: Implement bitcoin compressed format
+            throw new NotImplementedException();
         }
 
         public static ECDsaCng ConvertToCng(Key key)
