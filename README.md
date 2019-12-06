@@ -3,7 +3,7 @@ Purpose of this project is to provide CryptoCurrency and Cryptography related al
 
 [![Build Status](https://dev.azure.com/xandronus/NCryptoLib/_apis/build/status/xandronus.NCryptoLib?branchName=master)](https://dev.azure.com/xandronus/NCryptoLib/_build/latest?definitionId=1&branchName=master)
 
-Currently targeting C# 8 and .NET Core 3.0 only
+Currently targeting C# 8 and .NET Core 3.1 only
 
 | Interface | Implementation | Description |
 | --- | --- | --- |
