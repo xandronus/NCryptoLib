@@ -1,6 +1,8 @@
 # NCryptoLib
 Purpose of this project is to provide CryptoCurrency and Cryptography related algorithms using the latest C# language features for use in BlockChain development. Initial goals are to cover some key algorithms in use in Bitcoin and Ethereum BlockChains.
 
+[![Build Status](https://dev.azure.com/xandronus/NCryptoLib/_apis/build/status/xandronus.NCryptoLib?branchName=master)](https://dev.azure.com/xandronus/NCryptoLib/_build/latest?definitionId=1&branchName=master)
+
 Currently targeting C# 8 and .NET Core 3.0 only
 
 | Interface | Implementation | Description |
@@ -24,7 +26,7 @@ string p2pkhAddress = Address.GetP2PKHAddress(key, ecdsa, Bitcoin.Network.MainNe
 // returns "1PMycacnJaSqwwJqjawXBErnLsZ7RkXUAs"
 ```
 
-_Project is currently in development - no published packages or CI at this time._
+_Project is currently in development - no published packages at this time._
 
 ### **Contributions and suggestions welcome!** ###
 
