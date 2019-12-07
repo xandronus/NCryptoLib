@@ -188,7 +188,7 @@ namespace NCryptoLib.Tests
             //ISecret wifKey = key1.GetWif(NBitcoin.Network.Main);
 
             ////Example wif private key taken from https://en.bitcoin.it/wiki/Private_key
-            const string expected = "5Kb8kLf9zgWQnogidDA76MzPL6TsZZY36hWXMssSzNydYXYB9KF";
+            //const string expected = "5Kb8kLf9zgWQnogidDA76MzPL6TsZZY36hWXMssSzNydYXYB9KF";
             //Assert.True(wifKey.ToString() == expected);
         }
     }

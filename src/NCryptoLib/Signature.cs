@@ -6,6 +6,6 @@ namespace NCryptoLib
 {
     public ref struct Signature
     {
-        public Span<byte> Bytes;
+        public Span<byte> Bytes { get; set; }
     }
 }

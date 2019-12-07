@@ -13,5 +13,9 @@ namespace NCryptoLib
         public CryptoException(string message, Exception innerException) : base(message, innerException)
         {
         }
+
+        public CryptoException()
+        {
+        }
     }
 }

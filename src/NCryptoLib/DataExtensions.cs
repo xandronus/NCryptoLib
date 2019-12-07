@@ -14,6 +14,8 @@ namespace NCryptoLib
         /// <returns>the hash</returns>
         public static Hash256 Hash(this byte[] data)
         {
+            if (data == null)
+                throw new ArgumentException($"Invalid paramter to '{nameof(Hash)}'. Parameter '{nameof(data)}' cannot be null");
             MsftHasher hasher = new MsftHasher();
             return hasher.SHA256(data, 0, data.Length);
         }

@@ -16,7 +16,7 @@ namespace NCryptoLib.Bitcoin
         /// <param name="version">Version bytes of bitcoin network (0x00 for mainnet)</param>
         /// <param name="context">optional context</param>        
         /// <returns>Base58check bitcoin address</returns>
-        public static string GetP2PKHAddress(Key key, IECDsa dsa, Span<byte> version, DisposableContext context = null)
+        public static string GetP2PKHAddress(Key key, IECDsa dsa, Span<byte> version, DisposableContext? context = null)
         {
             return GetP2PKHAddress(key.PublicKey, dsa, version, context);
         }
@@ -30,8 +30,11 @@ namespace NCryptoLib.Bitcoin
         /// <param name="version">Version bytes of bitcoin network (0x00 for mainnet)</param>
         /// <param name="context">optional context</param>        
         /// <returns>Base58check bitcoin address</returns>
-        public static string GetP2PKHAddress(Span<byte> publicKey, IECDsa dsa, Span<byte> version, DisposableContext context = null)
+        public static string GetP2PKHAddress(Span<byte> publicKey, IECDsa dsa, Span<byte> version, DisposableContext? context = null)
         {
+            if (dsa == null)
+                throw new ArgumentException($"Invalid input parameters to '{nameof(GetP2PKHAddress)}'. '{nameof(dsa)}' cannot be null.");
+
             var compressedPublicKey = dsa.CompressPublicKey(publicKey, context);
             return compressedPublicKey.Hash().RIPEMD160().ToP2PKHAddress(version);
         }

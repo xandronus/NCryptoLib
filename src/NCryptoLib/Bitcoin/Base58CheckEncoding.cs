@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -54,22 +55,26 @@ namespace NCryptoLib.Bitcoin
             return dataWithoutChecksum;
         }
 
+
         /// <summary>
         /// Decodes data in plain Base58 to byte representation
         /// </summary>
         /// <param name="data">Data to be decoded</param>
-        /// <returns>Returns decoded data if valid; throws FormatException if invalid</returns>
+        /// <returns>Returns decoded data if valid; throws FormatException if invalid</returns>       
         public static Span<byte> Base58ToBytes(string data)
         {
+            if (data == null)
+                throw new ArgumentException($"Invalid parameter in '{nameof(Base58ToBytes)}'. '{nameof(data)}' cannot be null.");
+
             // Decode Base58 string to BigInteger 
             BigInteger intData = 0;
             for (var i = 0; i < data.Length; i++)
             {
-                var digit = Digits.IndexOf(data[i]); //Slow
+                var digit = Digits.IndexOf(data[i], StringComparison.InvariantCultureIgnoreCase); //Slow
 
                 if (digit < 0)
                 {
-                    throw new FormatException(string.Format("Invalid Base58 character `{0}` at position {1}", data[i], i));
+                    throw new FormatException(string.Format(CultureInfo.InvariantCulture, "Invalid Base58 character '{0}' at position {1}", data[i], i));
                 }
 
                 intData = intData * 58 + digit;

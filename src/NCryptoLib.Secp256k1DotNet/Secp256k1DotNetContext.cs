@@ -14,7 +14,8 @@ namespace NCryptoLib.ECDsa
         public void Dispose()
         {
             var context = this.Context as Secp256k1;
-            context.Dispose();
+            if (context != null)
+                context.Dispose();
         }
     }
 }

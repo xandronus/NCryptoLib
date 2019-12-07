@@ -9,11 +9,11 @@ namespace NCryptoLib
     /// </summary>
     public class DisposableContext
     {
-        public DisposableContext(object context)
+        public DisposableContext(object? context)
         {
             Context = context;
         }
 
-        public object Context { get; protected set; }
+        public object? Context { get; protected set; }
     }
 }

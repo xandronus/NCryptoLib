@@ -8,12 +8,13 @@ namespace NCryptoLib.ECDsa
 {
     /// <summary>
     /// Uses Microsofts ECDsaCng in System.Security.Cryptography
-    /// </summary>
+    /// </summary> 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Using alternative dispose pattern")]
     public class MsftECDsaCng : IECDsa
-    {        
-        public Span<byte> CreateSecret(DisposableContext context = null)
+    {
+        public Span<byte> CreateSecret(DisposableContext? context = null)
         {
-            ECDsaCng dsa = context?.Context as ECDsaCng;
+            var dsa = context?.Context as ECDsaCng;
             if (dsa == null)
             {
                 dsa = new ECDsaCng(256)
@@ -35,14 +36,14 @@ namespace NCryptoLib.ECDsa
             }
         }
 
-        public Key CreatePrivateKey(DisposableContext context = null)
+        public Key CreatePrivateKey(DisposableContext? context = null)
         {
             return this.CreateKey(context);
         }
 
-        public Key CreateKey(DisposableContext context = null)
+        public Key CreateKey(DisposableContext? context = null)
         {
-            ECDsaCng dsa = context?.Context as ECDsaCng;
+            var dsa = context?.Context as ECDsaCng;
             if (dsa == null)
             {
                 dsa = new ECDsaCng(256)
@@ -64,12 +65,12 @@ namespace NCryptoLib.ECDsa
             }
         }
 
-        public Key CreateKey(Span<byte> privateKey, DisposableContext context = null)
+        public Key CreateKey(Span<byte> privateKey, DisposableContext? context = null)
         {
             return new Key { PrivateKey = privateKey, PublicKey = this.CreatePublicKey(privateKey, context) };
         }
 
-        public bool IsPrivateKeyValid(Key key, DisposableContext context = null)
+        public bool IsPrivateKeyValid(Key key, DisposableContext? context = null)
         {
             try
             {
@@ -84,9 +85,9 @@ namespace NCryptoLib.ECDsa
             }
         }
 
-        public Signature SignData(byte[] data, Key key, DisposableContext context = null)
+        public Signature SignData(byte[] data, Key key, DisposableContext? context = null)
         {
-            ECDsaCng dsa = context?.Context as ECDsaCng;
+            var dsa = context?.Context as ECDsaCng;
             if (dsa == null)
             {
                 dsa = key.ToECDsaCngKey();
@@ -104,7 +105,7 @@ namespace NCryptoLib.ECDsa
             }
         }
 
-        public Signature SignData(byte[] data, DisposableContext context)
+        public Signature SignData(byte[] data, DisposableContext? context)
         {
             var dsa = context?.Context as ECDsaCng;
             if (dsa == null)
@@ -114,7 +115,7 @@ namespace NCryptoLib.ECDsa
             return new Signature { Bytes = signature };
         }
 
-        public Signature SignHash(Hash256 hash, DisposableContext context)
+        public Signature SignHash(Hash256 hash, DisposableContext? context)
         {
             var dsa = context?.Context as ECDsaCng;
             if (dsa == null)
@@ -125,9 +126,9 @@ namespace NCryptoLib.ECDsa
             return new Signature { Bytes = signature };
         }
 
-        public Signature SignHash(Hash256 hash, Key key, DisposableContext context = null)
+        public Signature SignHash(Hash256 hash, Key key, DisposableContext? context = null)
         {
-            ECDsaCng dsa = context?.Context as ECDsaCng;
+            var dsa = context?.Context as ECDsaCng;
             if (dsa == null)
             {
                 dsa = key.ToECDsaCngKey();
@@ -146,9 +147,9 @@ namespace NCryptoLib.ECDsa
             }           
         }
 
-        public bool VerifyData(byte[] data, Signature signature, Key key, DisposableContext context = null)
+        public bool VerifyData(byte[] data, Signature signature, Key key, DisposableContext? context = null)
         {
-            ECDsaCng dsa = context?.Context as ECDsaCng;
+            var dsa = context?.Context as ECDsaCng;
             if (dsa == null)
             {
                 dsa = key.ToECDsaCngKey();
@@ -165,7 +166,7 @@ namespace NCryptoLib.ECDsa
             }  
         }
 
-        public bool VerifyData(byte[] data, Signature signature, DisposableContext context)
+        public bool VerifyData(byte[] data, Signature signature, DisposableContext? context)
         {
             var dsa = context?.Context as ECDsaCng;
             if (dsa == null)
@@ -174,9 +175,9 @@ namespace NCryptoLib.ECDsa
             return dsa.VerifyData(data, signature.Bytes.ToArray());
         }
 
-        public bool VerifyHash(Hash256 hash, Signature signature, Key key, DisposableContext context = null)
+        public bool VerifyHash(Hash256 hash, Signature signature, Key key, DisposableContext? context = null)
         {
-            ECDsaCng dsa = context?.Context as ECDsaCng;
+            var dsa = context?.Context as ECDsaCng;
             if (dsa == null)
             {
                 dsa = key.ToECDsaCngKey();
@@ -193,7 +194,7 @@ namespace NCryptoLib.ECDsa
             } 
         }
 
-        public bool VerifyHash(Hash256 hash, Signature signature, DisposableContext context)
+        public bool VerifyHash(Hash256 hash, Signature signature, DisposableContext? context)
         {
             var dsa = context?.Context as ECDsaCng;
             if (dsa == null)
@@ -202,13 +203,13 @@ namespace NCryptoLib.ECDsa
             return dsa.VerifyHash(hash.Bytes, signature.Bytes.ToArray());
         }
 
-        public Span<byte> CreatePublicKey(Span<byte> privateKey, DisposableContext context = null)
+        public Span<byte> CreatePublicKey(Span<byte> privateKey, DisposableContext? context = null)
         {
             // TODO: Implement MSFT public key generation
             throw new NotImplementedException();
         }
 
-        public Span<byte> CompressPublicKey(Span<byte> uncompressed, DisposableContext context = null)
+        public Span<byte> CompressPublicKey(Span<byte> uncompressed, DisposableContext? context = null)
         {
             // TODO: Implement bitcoin compressed format
             throw new NotImplementedException();
@@ -244,10 +245,10 @@ namespace NCryptoLib.ECDsa
         }
 
         public static Key ConvertEccPrivateBlob(byte[] keyData)
-        { 
-            var privateKey = keyData.TakeLast(32).ToArray();
+        {
+            var privateKey = keyData != null ? keyData.TakeLast(32).ToArray() : null;
             var publicKeyPrefix = new byte[] { 0x40 };
-            var publicKey = publicKeyPrefix.Concat(keyData.Skip(8).Take(keyData.Length - 32 - 8)).ToArray();
+            var publicKey = keyData != null ? publicKeyPrefix.Concat(keyData.Skip(8).Take(keyData.Length - 32 - 8)).ToArray() : null;
             return new Key
             {
                 PrivateKey = privateKey,

@@ -17,6 +17,7 @@ using System.Linq;
 /// Licensed to the .NET Foundation under one or more agreements.
 namespace System.Security.Cryptography
 {
+    [Diagnostics.CodeAnalysis.SuppressMessage("Security", "CA5350:Do Not Use Weak Cryptographic Algorithms", Justification = "LOL - thanks for the tip MS")]
     public abstract class RIPEMD160 : System.Security.Cryptography.HashAlgorithm
     {
         public RIPEMD160()
@@ -27,13 +28,10 @@ namespace System.Security.Cryptography
         {
             return new RIPEMD160Managed();
         }
-
-        public new static RIPEMD160 Create(string hashname)
-        {
-            return new RIPEMD160Managed();
-        }
     }
 
+    [Diagnostics.CodeAnalysis.SuppressMessage("Security", "CA5350:Do Not Use Weak Cryptographic Algorithms", Justification = "LOL - thanks for the tip MS")]
+    [Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Code is temporary until MS exposes their version if they ever do.")]
     public class RIPEMD160Managed : RIPEMD160
     {
         static public UInt32 ReadUInt32(byte[] buffer, long offset)
@@ -150,7 +148,8 @@ namespace System.Security.Cryptography
             c = RotateLeft(c, 10);
         }
 
-        /// initializes MDbuffer to "magic constants"
+
+        /// initializes MDbuffer to "magic constants"        
         static public void MDinit(ref UInt32[] MDbuf)
         {
             MDbuf[0] = (UInt32)0x67452301;

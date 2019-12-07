@@ -18,7 +18,7 @@ namespace NCryptoLib.Hasher
         /// <param name="count">number of bytes of data from offset</param>
         /// <param name="context">optional hash context</param>
         /// <returns>the 32 byte hash</returns>
-        public Hash256 SHA256(byte[] data, int offset, int count, DisposableContext context = null);
+        public Hash256 SHA256(byte[] data, int offset, int count, DisposableContext? context = null);
 
         /// <summary>
         /// Generates a MD160 Hash from a SHA256 hash
@@ -26,6 +26,6 @@ namespace NCryptoLib.Hasher
         /// <param name="hash">SHA256 hash</param>
         /// <param name="context">optional context</param>
         /// <returns>the MD160 hash</returns>
-        public Hash160 RIPEMD160(Hash256 hash, DisposableContext context = null);
+        public Hash160 RIPEMD160(Hash256 hash, DisposableContext? context = null);
     }
 }

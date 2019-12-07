@@ -10,6 +10,7 @@ namespace NCryptoLib
     // return Pbkdf2.ComputeDerivedKey(new HMACSHA512(bytes), salt, 2048, 64);
     // https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki
     // https://github.com/realindiahotel/BIP39.NET
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1040:Avoid empty interfaces", Justification = "TODO: Item")]
     public interface IPbkdf2
     {
     }

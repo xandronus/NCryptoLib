@@ -10,6 +10,9 @@ namespace NCryptoLib.ECDsa
     {
         public static Span<byte> CreatePrivateKey(IECDsa ecdsa, int keyLength = 32)
         {
+            if (ecdsa == null)
+                throw new CryptoException($"Invalid input to '{nameof(CreatePrivateKey)}'. '{nameof(ecdsa)}' should not be NULL.");
+
             using (var rnd = RandomNumberGenerator.Create())
             {
                 var privateKey = new byte[keyLength];

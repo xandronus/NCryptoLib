@@ -12,7 +12,7 @@ namespace NCryptoLib
         /// <param name="text">text message</param>
         /// <param name="encoding">encoding of the message, default = UTF8</param>
         /// <returns>hash of the message</returns>
-        public static Hash256 HashOfText(this string text, Encoding encoding = null)
+        public static Hash256 HashOfText(this string text, Encoding? encoding = null)
         {
             if (encoding == null)
                 encoding = Encoding.UTF8;

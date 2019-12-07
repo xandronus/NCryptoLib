@@ -6,7 +6,7 @@ namespace NCryptoLib
 {
     public ref struct Key
     {
-        public Span<byte> PrivateKey;
-        public Span<byte> PublicKey;
+        public Span<byte> PrivateKey { get; set; }
+        public Span<byte> PublicKey { get; set; }
     }
 }
