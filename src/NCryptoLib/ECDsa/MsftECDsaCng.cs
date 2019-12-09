@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Security.Cryptography;
 using System.Linq;
+using NCryptoLib.Bitcoin;
 
 namespace NCryptoLib.ECDsa
 {
@@ -205,14 +206,12 @@ namespace NCryptoLib.ECDsa
 
         public Span<byte> CreatePublicKey(Span<byte> privateKey, DisposableContext? context = null)
         {
-            // TODO: Implement MSFT public key generation
-            throw new NotImplementedException();
+            throw new CryptoException($"Unsupported operation for '{nameof(MsftECDsaCng)}'.");
         }
 
         public Span<byte> CompressPublicKey(Span<byte> uncompressed, DisposableContext? context = null)
         {
-            // TODO: Implement bitcoin compressed format
-            throw new NotImplementedException();
+            return uncompressed.GetBitcoinCompressedPublicKey();
         }
 
         public static ECDsaCng ConvertToCng(Key key)

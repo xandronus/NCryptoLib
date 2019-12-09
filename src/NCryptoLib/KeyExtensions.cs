@@ -1,6 +1,7 @@
 ﻿using NCryptoLib.ECDsa;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -18,6 +19,16 @@ namespace NCryptoLib
             var dsa = new ECDsaCng(CngKey.Import(MsftECDsaCng.ConvertToCngKeyData(key), CngKeyBlobFormat.EccPrivateBlob));
             dsa.HashAlgorithm = CngAlgorithm.Sha256;
             return dsa;        
+        }
+
+        public static Span<byte> GetX(this Span<byte> key)
+        {
+            return key.Slice(0, 32);
+        }
+
+        public static Span<byte> GetY(this Span<byte> key)
+        {
+            return key.Slice(32, 32);
         }
     }
 }
