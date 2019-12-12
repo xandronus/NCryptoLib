@@ -22,7 +22,7 @@ namespace NCryptoLib.Tests
         }
 
         [Fact]
-        public void TestCompressPublicKey()
+        public void TestSECCompressedPublicKey()
         {
             // This key should generate a 0x02 compressed public key
             var privateKeyEven = "18e14a7b6a307f426a94f8114701e7c8e774e7f9a47e2c2035db29a206321725".HexToBytes();
@@ -30,20 +30,37 @@ namespace NCryptoLib.Tests
             // This key should generate a 0x03 compressed public key
             var privateKeyOdd  = "79FE45D61339181238E49424E905446A35497A8ADEA8B7D5241A1E7F2C95A04D".HexToBytes();
 
-            // Use Secp256k1 to generate the key because MSFT version is not smart enough to import privateKey with
+            // Use Secp256k1 to generate the key because MSFT version does not support import privateKey with
             // no public key.
             IECDsa secp256k1 = new Secp256k1DotNet();
             var evenKey = secp256k1.CreateKey(privateKeyEven);
 
             var msftecdsa = new MsftECDsaCng();
-            var evenBtc = secp256k1.CompressPublicKey(evenKey.PublicKey);
-            var evenMsft = msftecdsa.CompressPublicKey(evenKey.PublicKey);
+            var evenBtc = secp256k1.GetSECCompressedPublicKey(evenKey.PublicKey);
+            var evenMsft = msftecdsa.GetSECCompressedPublicKey(evenKey.PublicKey);
             Assert.Equal(evenBtc.ToArray(), evenMsft.ToArray());
 
             var oddKey = secp256k1.CreateKey(privateKeyOdd);
-            var oddBtc = secp256k1.CompressPublicKey(oddKey.PublicKey);
-            var oddMsft = msftecdsa.CompressPublicKey(oddKey.PublicKey);
+            var oddBtc = secp256k1.GetSECCompressedPublicKey(oddKey.PublicKey);
+            var oddMsft = msftecdsa.GetSECCompressedPublicKey(oddKey.PublicKey);
             Assert.Equal(oddBtc.ToArray(), oddMsft.ToArray());
+        }
+
+        [Fact]
+        public void TestSECUncompressedPublicKey()
+        {
+            // This key should generate a 0x02 compressed public key
+            var privateKey = "18e14a7b6a307f426a94f8114701e7c8e774e7f9a47e2c2035db29a206321725".HexToBytes();
+
+            // Use Secp256k1 to generate the key because MSFT version does not support import privateKey with
+            // no public key.
+            IECDsa secp256k1 = new Secp256k1DotNet();
+            var key = secp256k1.CreateKey(privateKey);
+
+            var msftecdsa = new MsftECDsaCng();
+            var btc = secp256k1.GetSECUncompressedPublicKey(key.PublicKey);
+            var msft = msftecdsa.GetSECUncompressedPublicKey(key.PublicKey);
+            Assert.Equal(btc.ToArray(), msft.ToArray());
         }
 
         [Fact]
@@ -51,7 +68,7 @@ namespace NCryptoLib.Tests
         {
             var privateKey = "18e14a7b6a307f426a94f8114701e7c8e774e7f9a47e2c2035db29a206321725".HexToBytes();
 
-            // Use Secp256k1 to generate the key because MSFT version is not smart enough to import privateKey with
+            // Use Secp256k1 to generate the key because MSFT version does support import privateKey with
             // no public key.
             IECDsa secp256k1 = new Secp256k1DotNet();
             var key = secp256k1.CreateKey(privateKey);

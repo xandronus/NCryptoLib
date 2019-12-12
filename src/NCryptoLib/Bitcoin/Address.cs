@@ -35,7 +35,7 @@ namespace NCryptoLib.Bitcoin
             if (dsa == null)
                 throw new ArgumentException($"Invalid input parameters to '{nameof(GetP2PKHAddress)}'. '{nameof(dsa)}' cannot be null.");
 
-            var compressedPublicKey = dsa.CompressPublicKey(publicKey, context);
+            var compressedPublicKey = dsa.GetSECCompressedPublicKey(publicKey, context);
             return compressedPublicKey.Hash().RIPEMD160().ToP2PKHAddress(version);
         }
     }

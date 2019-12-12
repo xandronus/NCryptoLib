@@ -15,6 +15,7 @@ namespace NCryptoLib.ECDsa
         public const int SignatureLength = Secp256k1Net.Secp256k1.SIGNATURE_LENGTH;
         public const int PublicKeyLength = Secp256k1Net.Secp256k1.PUBKEY_LENGTH;
         public const int PublicKeyCompressedLength = Secp256k1Net.Secp256k1.SERIALIZED_COMPRESSED_PUBKEY_LENGTH;
+        public const int PublicKeyUncompressedLength = Secp256k1Net.Secp256k1.SERIALIZED_UNCOMPRESSED_PUBKEY_LENGTH;
         public const int HashLength = Secp256k1Net.Secp256k1.HASH_LENGTH;
 
         public Span<byte> CreateSecret(DisposableContext? context = null)
@@ -31,7 +32,7 @@ namespace NCryptoLib.ECDsa
             };
         }
 
-        public Span<byte> CompressPublicKey(Span<byte> uncompressed, DisposableContext? context = null)
+        public Span<byte> GetSECCompressedPublicKey(Span<byte> uncompressed, DisposableContext? context = null)
         {
             Secp256k1Net.Secp256k1? dsa = context?.Context as Secp256k1Net.Secp256k1;
             if (dsa == null)
@@ -45,6 +46,28 @@ namespace NCryptoLib.ECDsa
                 if (!dsa.PublicKeySerialize(compressed, uncompressed, Secp256k1Net.Flags.SECP256K1_EC_COMPRESSED))
                     throw new CryptoException("Can't create public compressed key from uncompressed key");
                 return compressed;
+            }
+            finally
+            {
+                if (context == null)
+                    dsa?.Dispose();
+            }
+        }
+
+        public Span<byte> GetSECUncompressedPublicKey(Span<byte> uncompressed, DisposableContext? context = null)
+        {
+            Secp256k1Net.Secp256k1? dsa = context?.Context as Secp256k1Net.Secp256k1;
+            if (dsa == null)
+            {
+                dsa = new Secp256k1Net.Secp256k1();
+            }
+
+            try
+            {
+                Span<byte> uncompressedBtc = new byte[PublicKeyUncompressedLength];
+                if (!dsa.PublicKeySerialize(uncompressedBtc, uncompressed, Secp256k1Net.Flags.SECP256K1_EC_UNCOMPRESSED))
+                    throw new CryptoException("Can't create public uncompressed bitcoin key from uncompressed key");
+                return uncompressedBtc;
             }
             finally
             {

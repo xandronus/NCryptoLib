@@ -106,11 +106,21 @@ namespace NCryptoLib.ECDsa
         public Span<byte> CreatePublicKey(Span<byte> privateKey, DisposableContext? context = null);
 
         /// <summary>
-        /// Derives the compressed public key from the uncompressed public key
+        /// Derives the SEC compressed bitcoin public key from the uncompressed public key
+        /// SEC is in big endian format
         /// </summary>
         /// <param name="uncompressed">uncompressed public key (64 bytes)</param>
         /// <param name="context">optional context</param>
-        /// <returns>compressed public key 33 bytes</returns>
-        public Span<byte> CompressPublicKey(Span<byte> uncompressed, DisposableContext? context = null);
+        /// <returns>compressed public key (33 bytes)</returns>
+        public Span<byte> GetSECCompressedPublicKey(Span<byte> uncompressed, DisposableContext? context = null);
+
+        /// <summary>
+        /// Gets the public key in bitcoin SEC uncompressed format
+        /// SEC is in big endian format
+        /// </summary>
+        /// <param name="uncompressed">uncompressed public key (64 bytes)</param>
+        /// <param name="context">optional context</param>
+        /// <returns>bitcoin uncompressed public key (65 bytes)</returns>
+        public Span<byte> GetSECUncompressedPublicKey(Span<byte> uncompressed, DisposableContext? context = null);
     }
 }

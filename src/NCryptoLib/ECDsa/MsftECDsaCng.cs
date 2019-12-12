@@ -209,9 +209,14 @@ namespace NCryptoLib.ECDsa
             throw new CryptoException($"Unsupported operation for '{nameof(MsftECDsaCng)}'.");
         }
 
-        public Span<byte> CompressPublicKey(Span<byte> uncompressed, DisposableContext? context = null)
+        public Span<byte> GetSECCompressedPublicKey(Span<byte> uncompressed, DisposableContext? context = null)
         {
-            return uncompressed.GetBitcoinCompressedPublicKey();
+            return uncompressed.ToSECCompressedPublicKey();
+        }
+
+        public Span<byte> GetSECUncompressedPublicKey(Span<byte> uncompressed, DisposableContext? context = null)
+        {
+            return uncompressed.ToSECUncompressedPublicKey();
         }
 
         public static ECDsaCng ConvertToCng(Key key)
