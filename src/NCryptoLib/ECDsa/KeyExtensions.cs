@@ -7,26 +7,34 @@ namespace NCryptoLib.ECDsa
 {
     public static class KeyExtensions
     {
-        public static Span<byte> ToSECUncompressedPublicKey(this Span<byte> key)
+        public static Span<byte> ToSECUncompressedPublicKey(this Span<byte> publicKey)
         {
+            if (publicKey.Length != 64)
+                throw new ArgumentException("key must be 64 bytes long (uncompressed public key)");
+
             Span<byte> uncompressed = new byte[65];
 
             // uncompressed is prefixed with 0x04
             byte[] prefix = { 0x04 };
             prefix.CopyTo(uncompressed);
 
-            // Make big endian
-            key.Slice(0, 32).Reverse();
-            key.Slice(32, 32).Reverse();
+            // Copy after the prefix
+            publicKey.CopyTo(uncompressed.Slice(1));
 
-            key.CopyTo(uncompressed.Slice(1));
+            // Make big endian
+            uncompressed.Slice(1, 32).Reverse();
+            uncompressed.Slice(33, 32).Reverse();
 
             return uncompressed;
         }
 
-        public static Span<byte> ToSECCompressedPublicKey(this Span<byte> key)
+        public static Span<byte> ToSECCompressedPublicKey(this Span<byte> publicKey)
         {
-            var yBytes = key.GetY();
+            if (publicKey.Length != 64)
+                throw new ArgumentException("key must be 64 bytes long (uncompressed public key)");
+
+            // Use Y to figure out prefix
+            var yBytes = publicKey.GetY();
             BigInteger y = new BigInteger(yBytes);
             Span<byte> compressed = new byte[33];
             byte[] even = { 0x02 }; // prefix for even Y
@@ -35,9 +43,14 @@ namespace NCryptoLib.ECDsa
                 even.CopyTo(compressed);
             else
                 odd.CopyTo(compressed);
-            var x = key.GetX();
-            x.Reverse();
-            x.CopyTo(compressed.Slice(1)); // Skip the prefix and write the X
+
+            // Populate rest with Big Endian version of X
+            var x = publicKey.GetX();
+            Span<byte> xReversed = new byte[x.Length];
+            x.CopyTo(xReversed);
+            xReversed.Reverse();
+            xReversed.CopyTo(compressed.Slice(1)); // Skip the prefix and write the X
+
             return compressed;
         }
     }
